@@ -8,6 +8,7 @@ require (
 	github.com/dghubble/go-twitter v0.0.0-20190719072343-39e5462e111f
 	github.com/dghubble/oauth1 v0.6.0
 	github.com/mingrammer/commonregex v1.0.1 // indirect
+	github.com/sirupsen/logrus v1.4.2
 	gonum.org/v1/gonum v0.0.0-20191014194419-94c839842dda // indirect
 	gopkg.in/jdkato/prose.v2 v2.0.0-20190814032740-822d591a158c
 	gopkg.in/neurosnap/sentences.v1 v1.0.6 // indirect
