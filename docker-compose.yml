@@ -1,0 +1,19 @@
+# Docker Compose file Reference (https://docs.docker.com/compose/compose-file/)
+version: '3'
+services:
+  tw-trend:
+    build:
+      context: . # Use an image built from the specified dockerfile in the current directory.
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - RUNTIME
+      - LOCATION
+      - CONSUMERKEY
+      - CONSUMERSECRET
+      - ACCESSTOKEN
+      - ACCESSSECRET
+
