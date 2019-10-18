@@ -47,3 +47,4 @@ override.tf.json
 tmp
 data
 .env
+*.jsonl
