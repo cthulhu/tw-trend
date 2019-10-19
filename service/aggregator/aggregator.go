@@ -1,15 +1,25 @@
 package aggregator
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"sort"
+	"strings"
 
 	"github.com/cthulhu/tw-trend/domain"
 )
 
-func Aggregate(tweets []domain.Tweet, label string, maxAggAmount int) (*domain.Aggregated, error) {
+func Aggregate(reader io.Reader, label string, maxAggAmount int) (*domain.Aggregated, error) {
+	decoder := json.NewDecoder(reader)
 	aggregatedHash := make(map[string]int)
-	for _, tweet := range tweets {
+	var tweet domain.Tweet
+	var err error
+	for {
+		err = decoder.Decode(&tweet)
+		if err == io.EOF {
+			break
+		}
 		switch label {
 		case "words":
 			increment(aggregatedHash, tweet.Tokens)
@@ -19,9 +29,7 @@ func Aggregate(tweets []domain.Tweet, label string, maxAggAmount int) (*domain.A
 			return nil, fmt.Errorf("unknown label")
 		}
 	}
-
 	aggregated := &domain.Aggregated{TokensWithCounts: []domain.TokenWithCount{}}
-
 	for token, count := range aggregatedHash {
 		aggregated.TokensWithCounts = append(aggregated.TokensWithCounts, domain.TokenWithCount{token, count})
 	}
@@ -36,10 +44,11 @@ func Aggregate(tweets []domain.Tweet, label string, maxAggAmount int) (*domain.A
 
 func increment(aggregatedHash map[string]int, tokens []string) {
 	for _, t := range tokens {
-		if _, exists := aggregatedHash[t]; !exists {
-			aggregatedHash[t] = 1
+		tLow := strings.ToLower(t)
+		if _, exists := aggregatedHash[tLow]; !exists {
+			aggregatedHash[tLow] = 1
 		} else {
-			aggregatedHash[t]++
+			aggregatedHash[tLow]++
 		}
 	}
 }

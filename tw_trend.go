@@ -1,67 +1,55 @@
 package tw_trend
 
 import (
-	"net/http"
+	"os"
 
-	"github.com/cthulhu/tw-trend/resource"
 	"github.com/cthulhu/tw-trend/service/tw_streamer"
 	"github.com/cthulhu/tw-trend/store"
-	"github.com/julienschmidt/httprouter"
 	log "github.com/sirupsen/logrus"
 )
 
-type TwTrendApp struct {
-	consumerKey, consumerSecret, accessToken, accessSecret string
+func init() {
+	// Log as JSON instead of the default ASCII formatter.
+	log.SetFormatter(&log.JSONFormatter{})
 
-	httpServer *http.Server
+	// Output to stdout instead of the default stderr
+	// Can be any io.Writer, see below for File example
+	log.SetOutput(os.Stdout)
+}
+
+type TwTrendApp struct {
+	httpServer *Server
 	fileStore  *store.File
 	stream     *tw_streamer.TwStream
 }
 
-type Logger struct {
-	handler http.Handler
-}
-
-func (l *Logger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Info(r.Method, r.URL.Path)
-	l.handler.ServeHTTP(w, r)
-}
-
-func New(consumerKey, consumerSecret, accessToken, accessSecret string) *TwTrendApp {
-	return &TwTrendApp{consumerKey, consumerSecret, accessToken, accessSecret, nil, nil, nil}
+func New(consumerKey, consumerSecret, accessToken, accessSecret string, httpPort int) (*TwTrendApp, error) {
+	var err error
+	app := &TwTrendApp{nil, nil, nil}
+	app.stream, err = tw_streamer.New(consumerKey, consumerSecret, accessToken, accessSecret)
+	if err != nil {
+		return app, err
+	}
+	app.fileStore, err = store.New()
+	if err != nil {
+		return app, err
+	}
+	app.httpServer = NewServer(httpPort)
+	return app, nil
 }
 
 func (app *TwTrendApp) Run() error {
-	var err error
-	log.Info("Starting http")
-	router := httprouter.New()
-
-	app.stream, err = tw_streamer.New(app.consumerKey, app.consumerSecret, app.accessToken, app.accessSecret)
-	if err != nil {
-		return err
-	}
-
-	app.fileStore, err = store.New()
-	if err != nil {
-		return err
-	}
-
-	router.GET("/words", resource.Words)
-	router.GET("/hashtags", resource.Hashtags)
-	router.GET("/data", resource.Data)
-
 	go func() {
 		app.fileStore.JSONlStream(app.stream.TweetsAsJSONl())
 		if err := app.stream.Run(); err != nil {
 			log.Error(err)
 		}
 	}()
-
-	return http.ListenAndServe(":8000", &Logger{router})
+	return app.httpServer.Run()
 }
 
 func (app *TwTrendApp) Stop() {
-	log.Info("Stoping http")
+	app.httpServer.Close()
 	app.stream.Close()
 	app.fileStore.Close()
 }

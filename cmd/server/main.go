@@ -4,6 +4,7 @@ import (
 	// "fmt"
 	"fmt"
 	"os"
+	"strconv"
 
 	// "os/signal"
 	// "syscall"
@@ -53,13 +54,17 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
-
-	app := tw_trend.New(consumerKey, consumerSecret, accessToken, accessSecret)
-
+	httpPort, err := strconv.Atoi(defaultEnvValue("HTTP_PORT", "8000"))
+	if err != nil {
+		log.Panic(err)
+	}
+	app, err := tw_trend.New(consumerKey, consumerSecret, accessToken, accessSecret, httpPort)
+	if err != nil {
+		log.Panic(err)
+	}
 	// // Wait for SIGINT and SIGTERM (HIT CTRL-C)
 	// ch := make(chan os.Signal)
 	// signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
-
 	if err = app.Run(); err != nil {
 		log.Panic(err)
 	}
@@ -71,4 +76,12 @@ func ensureEnvValue(envVarName string) (string, error) {
 		return "", fmt.Errorf("Env Variable %s is required", envVarName)
 	}
 	return value, nil
+}
+
+func defaultEnvValue(envVarName, defaultValue string) string {
+	value := os.Getenv(envVarName)
+	if value == "" {
+		return defaultValue
+	}
+	return value
 }
