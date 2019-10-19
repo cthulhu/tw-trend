@@ -69,7 +69,7 @@ var _ = Describe("TwTrend", func() {
 							domain.TokenWithCount{Token: "icdirect", Count: 12},
 							domain.TokenWithCount{Token: "ade", Count: 7},
 							domain.TokenWithCount{Token: "ade19", Count: 6},
-							domain.TokenWithCount{Token: "ade2019", Count: 4},
+							domain.TokenWithCount{Token: "amsterdamdanceevent", Count: 4},
 						},
 					},
 				}))
