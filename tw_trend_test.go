@@ -18,12 +18,13 @@ var _ = Describe("TwTrend", func() {
 	const PORT = 9000
 	server := NewServer(PORT)
 	go server.Run()
-	resource.MAX_RESULTS = 5
-	store.VolumeDir = "fixtures"
-	store.FetchDaysForReports = func() []string {
-		return []string{"20191010", "20191017", "20191018"}
-	}
-
+	BeforeEach(func() {
+		resource.MAX_RESULTS = 5
+		store.VolumeDir = "fixtures"
+		store.FetchDaysForReports = func() []string {
+			return []string{"20191010", "20191017", "20191018"}
+		}
+	})
 	Context("Server", func() {
 		Context("On ping", func() {
 			It("serves helth checks", func() {
@@ -53,6 +54,20 @@ var _ = Describe("TwTrend", func() {
 				}))
 			})
 		})
+		Context("On words no files", func() {
+			It("serves trending", func() {
+				store.VolumeDir = "tmp"
+				resp, err := http.Get(fmt.Sprintf("http://localhost:%d/words", PORT))
+				Expect(err).NotTo(HaveOccurred())
+				Expect(resp.StatusCode).To(Equal(200))
+				words := domain.WordsReport{}
+				decoder := json.NewDecoder(resp.Body)
+				Expect(decoder.Decode(&words)).NotTo(HaveOccurred())
+				Expect(words).To(BeEquivalentTo(domain.WordsReport{
+					Aggregated: &domain.Aggregated{TokensWithCounts: []domain.TokenWithCount{}},
+				}))
+			})
+		})
 		Context("On hashtags", func() {
 			It("serves trending", func() {
 				resp, err := http.Get(fmt.Sprintf("http://localhost:%d/hashtags", PORT))
@@ -69,11 +84,10 @@ var _ = Describe("TwTrend", func() {
 							domain.TokenWithCount{Token: "icdirect", Count: 12},
 							domain.TokenWithCount{Token: "ade", Count: 7},
 							domain.TokenWithCount{Token: "ade19", Count: 6},
-							domain.TokenWithCount{Token: "amsterdamdanceevent", Count: 4},
+							domain.TokenWithCount{Token: "amsterdamdanceevent", Count: 5},
 						},
 					},
 				}))
-
 			})
 		})
 		Context("On data", func() {

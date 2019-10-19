@@ -20,6 +20,9 @@ func (mf *MultiFile) Close() error {
 }
 
 func (mf *MultiFile) Read(p []byte) (n int, err error) {
+	if len(mf.files) == 0 {
+		return 0, io.EOF
+	}
 	n, err = mf.files[mf.currentFile].Read(p)
 	if err == io.EOF && mf.currentFile < len(mf.files)-1 {
 		mf.currentFile++

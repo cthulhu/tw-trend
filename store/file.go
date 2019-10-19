@@ -94,6 +94,10 @@ func FilesForReport() []string {
 func TweetsReadCloser() (io.ReadCloser, error) {
 	mf := &MultiFile{}
 	for _, fileName := range FilesForReport() {
+		_, err := os.Stat(fileName)
+		if os.IsNotExist(err) {
+			continue
+		}
 		f, err := os.Open(fileName)
 		if err != nil {
 			return nil, err
