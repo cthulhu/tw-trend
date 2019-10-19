@@ -45,6 +45,12 @@ pipeline???
 cd infra/aws && terraform taint ... && terraform apply
 ```
 
+Container pushed to docker hub:
+
+```
+https://cloud.docker.com/u/stanpogrebnyak/repository/docker/stanpogrebnyak/tw-trend
+```
+
 ## Running the tests
 
 Docker has multiple stages one of them is to run tests as well. In order to run tests just build the container.
@@ -55,6 +61,7 @@ Docker has multiple stages one of them is to run tests as well. In order to run 
 * [Golang](https://golang.org/) - The language used
 * [GoTwitter](https://github.com/dghubble/go-twitter/) - Twitter API sdk
 * [Terraform](https://www.terraform.io/) - IaaC
+* [Docker](https://www.docker.com/) - Containers
 
 * AWS infra:
    * AWS Fargate (https://aws.amazon.com/fargate/)
