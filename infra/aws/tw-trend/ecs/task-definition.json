@@ -1,0 +1,47 @@
+[
+  {
+    "cpu": 256,
+    "essential": true,
+    "image": "${image_url}",
+    "memory": 512,
+    "name": "${container_name}",
+    "portMappings": [
+      {
+        "containerPort": ${container_port
+        },
+        "hostPort": 0
+      }
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${log_group_name}",
+        "awslogs-region": "${log_group_region}"
+      }
+    },
+    "environment": [
+      {
+        "name": "HTTP_PORT",
+        "value": "5000"
+      }
+    ],
+    "secrets": [
+      {
+        "name": "CONSUMERKEY",
+        "valueFrom": "arn:aws:ssm:${region}:${account_id}:parameter/${name}/${env}/CONSUMERKEY"
+      },
+      {
+        "name": "CONSUMERSECRET",
+        "valueFrom": "arn:aws:ssm:${region}:${account_id}:parameter/${name}/${env}/CONSUMERSECRET"
+      },
+      {
+        "name": "ACCESSTOKEN",
+        "valueFrom": "arn:aws:ssm:${region}:${account_id}:parameter/${name}/${env}/ACCESSTOKEN"
+      },
+      {
+        "name": "ACCESSSECRET",
+        "valueFrom": "arn:aws:ssm:${region}:${account_id}:parameter/${name}/${env}/ACCESSSECRET"
+      }
+    ]
+  }
+]

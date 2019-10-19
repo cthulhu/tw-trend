@@ -38,6 +38,7 @@ func (s *Server) Run() error {
 	router.GET("/data/:time_id", resource.Data)
 
 	router.GET("/ping", goping.Ping())
+	router.GET("/", goping.Ping())
 
 	return http.ListenAndServe(fmt.Sprintf(":%d", s.port), &Logger{router})
 }
