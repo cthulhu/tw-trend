@@ -58,7 +58,8 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
-	app, err := tw_trend.New(consumerKey, consumerSecret, accessToken, accessSecret, httpPort)
+	app, err := tw_trend.New(consumerKey, consumerSecret,
+		accessToken, accessSecret, defaultEnvValue("DATA_DIR", "fixtures"), httpPort)
 	if err != nil {
 		log.Panic(err)
 	}

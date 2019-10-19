@@ -71,3 +71,5 @@ EOF
 chmod +x /usr/local/bin/claimspace.sh
 echo "0 0 * * * root /usr/local/bin/claimspace.sh" > /etc/cron.d/claimspace
 
+mkdir -p /mnt/data
+chmod 0777 /mnt/data

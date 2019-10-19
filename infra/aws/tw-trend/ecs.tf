@@ -25,6 +25,10 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
   tags                  = var.tags
   execution_role_arn    = aws_iam_role.ecs_task.arn
   task_role_arn         = aws_iam_role.ecs_task.arn
+  volume {
+    name      = "data-dir"
+    host_path = "/mnt/data"
+  }
 }
 
 

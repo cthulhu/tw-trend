@@ -23,8 +23,9 @@ type TwTrendApp struct {
 	stream     *tw_streamer.TwStream
 }
 
-func New(consumerKey, consumerSecret, accessToken, accessSecret string, httpPort int) (*TwTrendApp, error) {
+func New(consumerKey, consumerSecret, accessToken, accessSecret, dataDir string, httpPort int) (*TwTrendApp, error) {
 	var err error
+	store.VolumeDir = dataDir
 	app := &TwTrendApp{nil, nil, nil}
 	app.stream, err = tw_streamer.New(consumerKey, consumerSecret, accessToken, accessSecret)
 	if err != nil {

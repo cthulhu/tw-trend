@@ -7,8 +7,7 @@
     "name": "${container_name}",
     "portMappings": [
       {
-        "containerPort": ${container_port
-        },
+        "containerPort": ${container_port},
         "hostPort": 0
       }
     ],
@@ -19,10 +18,20 @@
         "awslogs-region": "${log_group_region}"
       }
     },
+    "mountPoints" : [
+      {
+        "containerPath" : "/data",
+        "sourceVolume" : "data-dir"
+      }
+    ],
     "environment": [
       {
         "name": "HTTP_PORT",
         "value": "5000"
+      },
+      {
+        "name": "DATA_DIR",
+        "value": "/data"
       }
     ],
     "secrets": [
