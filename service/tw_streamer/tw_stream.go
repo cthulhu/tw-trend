@@ -25,7 +25,15 @@ func New(consumerKey, consumerSecret, accessToken, accessSecret string) (*TwStre
 	httpClient := config.Client(oauth1.NoContext, token)
 
 	client := twitter.NewClient(httpClient)
-
+	// hack to test authentication
+	// twitter stream api doesn't check correctness of tockens
+	_, _, err = client.Timelines.HomeTimeline(&twitter.HomeTimelineParams{
+		Count: 1,
+	})
+	if err != nil {
+		return nil, err
+	}
+	// hack to test authentication
 	filterParams := &twitter.StreamFilterParams{
 		Locations: []string{"4.729242", "52.278174", "5.079162", "52.431064"},
 	}
