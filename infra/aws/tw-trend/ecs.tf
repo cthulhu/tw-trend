@@ -1,3 +1,8 @@
+resource "aws_key_pair" "ecs" {
+  key_name   = "${var.name}-${var.env}-ecs"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDh+LprE1iivuba6N/Vx/XyAZCFBSH4bi3J7vwyxMU61QrVEYnlb+nycUgILMzrHLsQ1f3qboFdNv3RfFNQULiWI99hnEpnaOqBByoUaW1Ejq/fVg+7Rsg3QpZRQQPBimDcNTayFG5OFvK8FgeY5oZbbAsqNlxR3PgwmMhBPz94Zv4TfDUSBV+0490MaSkjuC/o3BDP/PQykjb5kZ0KtuJyyQ67xlbXBS44NUefXH4Ym9NN2mU4BncKZGQO6MXRDnKHOx6sMkwHFo1YcLIcQzi0Ukmf5Pni9Lj6IdCYtC3ntjQaqCEj4oZNxGYNx3VaspbhCkzT2aPlnlxgsPa0MxnzCSh//Eh+xIZpJ9DGV5HJbehXe5WTdm96kJG8l4yUuQvL7101A1lUjCxCXINmqVBPPEtJCbeaeoclV+aGTSoiml6umdAJe7wHAOaI3zUigJ+A3BfxdloDsIt5d1h7IbR2PrhEdXGCZFY9eOwaGt47fbF6u5p6LWatKa8x/9ZBk54plKPkiB4G6Jdt5uUSkLwX2b5meXaMxQeWLMrf3X/zCCdqWEkZrx+bldS8Kx7O/Wg8DNuBzx+84SBfpoEqNl7F9TJ/pdsEw1S+baQfWMz4Km+26uQHwCFxC+24w96O0HT9Y56Lvb4Izu5QDRGaMcLL73sJlBPNKf0M02JEEAwwIw== spogrebnyak@xebia.com"
+}
+
 resource "aws_ecs_cluster" "ecs_cluster" {
   name = "${var.name}-${var.env}-cluster"
   tags = var.tags
@@ -113,14 +118,14 @@ resource "aws_security_group_rule" "instance_out_all" {
   security_group_id = "${aws_security_group.instance.id}"
 }
 
-# resource "aws_security_group_rule" "allow_ssh" {
-#   type            = "ingress"
-#   from_port       = 22
-#   to_port         = 22
-#   protocol        = "tcp"
-#   security_group_id = "${aws_security_group.instance.id}"
-#   source_security_group_id = "${module.bastion.security_group_id}"
-# }
+resource "aws_security_group_rule" "allow_ssh" {
+  type            = "ingress"
+  from_port       = 22
+  to_port         = 22
+  protocol        = "tcp"
+  security_group_id = aws_security_group.instance.id
+  source_security_group_id = aws_security_group.bastion.id
+}
 
 data "template_file" "user_data" {
   template = file("${path.module}/ecs/user_data.sh")
@@ -154,7 +159,7 @@ resource "aws_launch_configuration" "instance" {
   iam_instance_profile = aws_iam_instance_profile.instance.name
   user_data            = data.template_file.user_data.rendered
   security_groups      = [aws_security_group.instance.id]
-  key_name             = aws_key_pair.key-pair.key_name
+  key_name             = aws_key_pair.ecs.key_name
 
   root_block_device {
     volume_size = var.instance_root_volume_size
